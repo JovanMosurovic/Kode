@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
@@ -115,19 +114,23 @@ private fun MenuBarDropdown(
             modifier = Modifier.height(48.dp),
             shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.textButtonColors(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onSurface
+                containerColor = if (expanded) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                else MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground
             )
         ) {
-            Text(title)
+            Text(
+                title,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             offset = DpOffset(0.dp, 0.dp),
-            containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 4.dp
+            containerColor = MaterialTheme.colorScheme.background,
+            tonalElevation = 2.dp
         ) {
             items.forEach { item ->
                 if (item.isSeparator) {
@@ -137,7 +140,8 @@ private fun MenuBarDropdown(
                         text = {
                             Text(
                                 item.label,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         },
                         leadingIcon = item.icon?.let {
@@ -155,8 +159,8 @@ private fun MenuBarDropdown(
                             expanded = false
                         },
                         colors = MenuDefaults.itemColors(
-                            textColor = MaterialTheme.colorScheme.onSurface,
-                            leadingIconColor = MaterialTheme.colorScheme.onSurface
+                            textColor = MaterialTheme.colorScheme.onBackground,
+                            leadingIconColor = MaterialTheme.colorScheme.onBackground
                         )
                     )
                 }
