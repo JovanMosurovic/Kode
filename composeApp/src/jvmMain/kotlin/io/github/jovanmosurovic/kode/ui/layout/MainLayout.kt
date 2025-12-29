@@ -1,9 +1,90 @@
 package io.github.jovanmosurovic.kode.ui.layout
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
+import io.github.jovanmosurovic.kode.ui.panels.console.ConsolePanel
+import io.github.jovanmosurovic.kode.ui.panels.editor.EditorPanel
+import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
+import org.jetbrains.compose.splitpane.HorizontalSplitPane
+import org.jetbrains.compose.splitpane.VerticalSplitPane
+import org.jetbrains.compose.splitpane.rememberSplitPaneState
+import io.github.jovanmosurovic.kode.ui.components.horizontalSplitter
+import io.github.jovanmosurovic.kode.ui.components.verticalSplitter
 
+enum class PanelLayout {
+    HORIZONTAL_50_50,
+    HORIZONTAL_70_30,
+    HORIZONTAL_30_70,
 
+    VERTICAL_50_50,
+    VERTICAL_70_30,
+    VERTICAL_30_70
+}
+
+@OptIn(ExperimentalSplitPaneApi::class)
 @Composable
-fun MainLayout() {
+fun MainLayout(
+    currentLayout: PanelLayout = PanelLayout.HORIZONTAL_50_50
+) {
+    when (currentLayout) {
+        PanelLayout.HORIZONTAL_50_50 -> {
+            HorizontalSplitPane(
+                splitPaneState = rememberSplitPaneState(0.5f)
+            ) {
+                first(minSize = 100.dp) { EditorPanel() }
+                second(minSize = 100.dp) { ConsolePanel() }
+                splitter { horizontalSplitter() }
+            }
+        }
 
+        PanelLayout.HORIZONTAL_70_30 -> {
+            HorizontalSplitPane(
+                splitPaneState = rememberSplitPaneState(0.7f)
+            ) {
+                first(minSize = 100.dp) { EditorPanel() }
+                second(minSize = 100.dp) { ConsolePanel() }
+                splitter { horizontalSplitter() }
+            }
+        }
+
+        PanelLayout.HORIZONTAL_30_70 -> {
+            HorizontalSplitPane(
+                splitPaneState = rememberSplitPaneState(0.3f)
+            ) {
+                first(minSize = 100.dp) { EditorPanel() }
+                second(minSize = 100.dp) { ConsolePanel() }
+                splitter { horizontalSplitter() }
+            }
+        }
+
+        PanelLayout.VERTICAL_50_50 -> {
+            VerticalSplitPane(
+                splitPaneState = rememberSplitPaneState(0.5f)
+            ) {
+                first(minSize = 100.dp) { EditorPanel() }
+                second(minSize = 100.dp) { ConsolePanel() }
+                splitter { verticalSplitter() }
+            }
+        }
+
+        PanelLayout.VERTICAL_70_30 -> {
+            VerticalSplitPane(
+                splitPaneState = rememberSplitPaneState(0.7f)
+            ) {
+                first(minSize = 100.dp) { EditorPanel() }
+                second(minSize = 100.dp) { ConsolePanel() }
+                splitter { verticalSplitter() }
+            }
+        }
+
+        PanelLayout.VERTICAL_30_70 -> {
+            VerticalSplitPane(
+                splitPaneState = rememberSplitPaneState(0.3f)
+            ) {
+                first(minSize = 100.dp) { EditorPanel() }
+                second(minSize = 100.dp) { ConsolePanel() }
+                splitter { verticalSplitter() }
+            }
+        }
+    }
 }

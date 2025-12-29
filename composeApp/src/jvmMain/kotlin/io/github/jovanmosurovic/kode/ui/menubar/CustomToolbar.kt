@@ -66,21 +66,32 @@ fun CustomToolbar(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            FilledTonalButton(
+            FloatingActionButton(
                 onClick = onRunClick,
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = Color(0xFF4CAF50),
-                    contentColor = Color.White
-                ),
+                modifier = Modifier.height(36.dp)
+            ) {
+                Row {
+                    Icon(
+                        imageVector = Icons.Outlined.PlayArrow,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+//                    Text("Run")
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(0.02f))
+
+            FloatingActionButton(
+                onClick = {},
                 modifier = Modifier.height(36.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.PlayArrow,
+                    imageVector = Icons.Outlined.Stop,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Run")
             }
         }
     }

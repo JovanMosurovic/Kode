@@ -22,6 +22,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(compose.materialIconsExtended)
             implementation("org.jetbrains.compose.components:components-splitpane:1.4.0")
+            // https://mvnrepository.com/artifact/dev.snipme/highlights-jvm
+            implementation("dev.snipme:highlights-jvm:1.1.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
