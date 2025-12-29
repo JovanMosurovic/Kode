@@ -1,6 +1,5 @@
 package io.github.jovanmosurovic.kode.ui.menubar
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -9,6 +8,7 @@ import androidx.compose.material.icons.automirrored.outlined.NoteAdd
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -91,7 +91,7 @@ private fun MenuBarDropdown(
     title: String,
     items: List<MenuItem>
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
     Box {
         TextButton(
@@ -99,7 +99,8 @@ private fun MenuBarDropdown(
             modifier = Modifier.height(48.dp),
             shape = RoundedCornerShape(7.dp),
             colors = ButtonDefaults.textButtonColors(
-                containerColor = Color.Transparent
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.onSurface
             )
         ) {
             Text(title)
