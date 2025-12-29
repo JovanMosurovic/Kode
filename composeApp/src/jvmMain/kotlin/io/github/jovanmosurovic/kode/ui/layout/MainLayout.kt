@@ -3,13 +3,14 @@ package io.github.jovanmosurovic.kode.ui.layout
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import io.github.jovanmosurovic.kode.ui.panels.console.ConsolePanel
-import io.github.jovanmosurovic.kode.ui.panels.editor.EditorPanel
+import io.github.jovanmosurovic.kode.ui.panels.editor.CodeEditorPanel
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.VerticalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 import io.github.jovanmosurovic.kode.ui.components.horizontalSplitter
 import io.github.jovanmosurovic.kode.ui.components.verticalSplitter
+import io.github.jovanmosurovic.kode.ui.panels.editor.EditorViewModel
 
 enum class PanelLayout {
     HORIZONTAL_50_50,
@@ -24,6 +25,7 @@ enum class PanelLayout {
 @OptIn(ExperimentalSplitPaneApi::class)
 @Composable
 fun MainLayout(
+    editorViewModel: EditorViewModel,
     currentLayout: PanelLayout = PanelLayout.HORIZONTAL_50_50
 ) {
     when (currentLayout) {
@@ -31,7 +33,7 @@ fun MainLayout(
             HorizontalSplitPane(
                 splitPaneState = rememberSplitPaneState(0.5f)
             ) {
-                first(minSize = 100.dp) { EditorPanel() }
+                first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
                 second(minSize = 100.dp) { ConsolePanel() }
                 splitter { horizontalSplitter() }
             }
@@ -41,7 +43,7 @@ fun MainLayout(
             HorizontalSplitPane(
                 splitPaneState = rememberSplitPaneState(0.7f)
             ) {
-                first(minSize = 100.dp) { EditorPanel() }
+                first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
                 second(minSize = 100.dp) { ConsolePanel() }
                 splitter { horizontalSplitter() }
             }
@@ -51,7 +53,7 @@ fun MainLayout(
             HorizontalSplitPane(
                 splitPaneState = rememberSplitPaneState(0.3f)
             ) {
-                first(minSize = 100.dp) { EditorPanel() }
+                first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
                 second(minSize = 100.dp) { ConsolePanel() }
                 splitter { horizontalSplitter() }
             }
@@ -61,7 +63,7 @@ fun MainLayout(
             VerticalSplitPane(
                 splitPaneState = rememberSplitPaneState(0.5f)
             ) {
-                first(minSize = 100.dp) { EditorPanel() }
+                first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
                 second(minSize = 100.dp) { ConsolePanel() }
                 splitter { verticalSplitter() }
             }
@@ -71,7 +73,7 @@ fun MainLayout(
             VerticalSplitPane(
                 splitPaneState = rememberSplitPaneState(0.7f)
             ) {
-                first(minSize = 100.dp) { EditorPanel() }
+                first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
                 second(minSize = 100.dp) { ConsolePanel() }
                 splitter { verticalSplitter() }
             }
@@ -81,7 +83,7 @@ fun MainLayout(
             VerticalSplitPane(
                 splitPaneState = rememberSplitPaneState(0.3f)
             ) {
-                first(minSize = 100.dp) { EditorPanel() }
+                first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
                 second(minSize = 100.dp) { ConsolePanel() }
                 splitter { verticalSplitter() }
             }

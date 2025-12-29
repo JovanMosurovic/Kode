@@ -25,8 +25,8 @@ fun CustomToolbar(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = 1.dp
+        color = MaterialTheme.colorScheme.background,
+        tonalElevation = 0.dp
     ) {
         Row(
             modifier = Modifier
@@ -68,24 +68,29 @@ fun CustomToolbar(
 
             FloatingActionButton(
                 onClick = onRunClick,
-                modifier = Modifier.height(36.dp)
+                modifier = Modifier.height(36.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Row {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         imageVector = Icons.Outlined.PlayArrow,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-//                    Text("Run")
                 }
             }
 
-            Spacer(modifier = Modifier.weight(0.02f))
+            Spacer(modifier = Modifier.width(8.dp))
 
             FloatingActionButton(
                 onClick = {},
-                modifier = Modifier.height(36.dp)
+                modifier = Modifier.height(36.dp),
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Stop,
@@ -108,7 +113,7 @@ private fun MenuBarDropdown(
         TextButton(
             onClick = { expanded = true },
             modifier = Modifier.height(48.dp),
-            shape = RoundedCornerShape(7.dp),
+            shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.textButtonColors(
                 containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.onSurface
@@ -120,31 +125,44 @@ private fun MenuBarDropdown(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            offset = DpOffset(0.dp, 0.dp)
+            offset = DpOffset(0.dp, 0.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 4.dp
         ) {
             items.forEach { item ->
                 if (item.isSeparator) {
-                    HorizontalDivider()
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
                 } else {
                     DropdownMenuItem(
-                        text = { Text(item.label) },
+                        text = {
+                            Text(
+                                item.label,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
                         leadingIcon = item.icon?.let {
                             {
                                 Icon(
                                     imageVector = it,
                                     contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         },
                         onClick = {
                             item.onClick()
                             expanded = false
-                        }
+                        },
+                        colors = MenuDefaults.itemColors(
+                            textColor = MaterialTheme.colorScheme.onSurface,
+                            leadingIconColor = MaterialTheme.colorScheme.onSurface
+                        )
                     )
                 }
             }
         }
     }
 }
+
 
