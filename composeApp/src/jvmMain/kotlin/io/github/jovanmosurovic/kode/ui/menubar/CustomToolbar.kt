@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import io.github.jovanmosurovic.kode.ui.components.LayoutSelector
+import io.github.jovanmosurovic.kode.ui.layout.PanelLayout
 
 @Composable
 fun CustomToolbar(
@@ -20,7 +22,9 @@ fun CustomToolbar(
     onNewFile: () -> Unit,
     onOpenFile: () -> Unit,
     onSaveFile: () -> Unit,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    currentLayout: PanelLayout,
+    onLayoutChange: (PanelLayout) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -64,6 +68,13 @@ fun CustomToolbar(
             )
 
             Spacer(modifier = Modifier.weight(1f))
+
+            LayoutSelector(
+                currentLayout = currentLayout,
+                onLayoutChange = onLayoutChange
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
 
             FloatingActionButton(
                 onClick = onRunClick,
