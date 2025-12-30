@@ -28,7 +28,7 @@ import io.github.jovanmosurovic.kode.utils.FileConstants
 
 @OptIn(ExperimentalSplitPaneApi::class)
 @Composable
-fun App() {
+fun App(onCloseRequest: () -> Unit = {}) {
 
     val editorViewModel = remember { EditorViewModel() }
     val consoleViewModel = remember { ConsoleViewModel() }
@@ -56,7 +56,7 @@ fun App() {
                 onOpenFile = { fileMenuActions.onOpenFile() },
                 onSaveFile = { fileMenuActions.onSave() },
                 onSaveFileAs = { fileMenuActions.onSaveAs() },
-                onExit = {},
+                onExit = onCloseRequest,
                 currentLayout = currentLayout,
                 onLayoutChange = { currentLayout = it },
                 onAbout = { showAboutDialog = true }

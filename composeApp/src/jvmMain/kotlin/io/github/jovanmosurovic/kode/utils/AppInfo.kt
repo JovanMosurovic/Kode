@@ -1,6 +1,7 @@
 package io.github.jovanmosurovic.kode.utils
 
 object AppInfo {
+    const val APP_NAME = "Kode"
     const val VERSION = "1.0"
     const val DATE = "December 2025"
     const val CONTACT = "mosurovicjovan@gmail.com"
