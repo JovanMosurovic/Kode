@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.jovanmosurovic.kode.ui.dialogs.AboutDialog
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import io.github.jovanmosurovic.kode.ui.layout.MainLayout
 import io.github.jovanmosurovic.kode.ui.layout.PanelLayout
@@ -28,7 +29,8 @@ fun App() {
 
     val editorViewModel = remember { EditorViewModel() }
     val consoleViewModel = remember { ConsoleViewModel() }
-    var currentLayout by remember { mutableStateOf(PanelLayout.VERTICAL_70_30) }
+    var currentLayout by remember { mutableStateOf(PanelLayout.HORIZONTAL_50_50) }
+    var showAboutDialog by remember { mutableStateOf(false) }
 
     KodeTheme {
         Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -39,7 +41,8 @@ fun App() {
                 onSaveFile = { println("Save file") },
                 onExit = {},
                 currentLayout = currentLayout,
-                onLayoutChange = { currentLayout = it }
+                onLayoutChange = { currentLayout = it },
+                onAbout = { showAboutDialog = true }
             )
 
             HorizontalDivider(
@@ -55,6 +58,10 @@ fun App() {
             ) {
                 MainLayout(editorViewModel, consoleViewModel, currentLayout)
             }
+        }
+
+        if (showAboutDialog) {
+            AboutDialog(onDismiss = { showAboutDialog = false })
         }
     }
 

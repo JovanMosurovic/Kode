@@ -11,10 +11,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import io.github.jovanmosurovic.kode.ui.components.LayoutSelector
 import io.github.jovanmosurovic.kode.ui.layout.PanelLayout
+import kode.composeapp.generated.resources.Res
+import kode.composeapp.generated.resources.play_icon
+import kode.composeapp.generated.resources.stop_icon
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CustomToolbar(
@@ -24,7 +29,8 @@ fun CustomToolbar(
     onSaveFile: () -> Unit,
     onExit: () -> Unit,
     currentLayout: PanelLayout,
-    onLayoutChange: (PanelLayout) -> Unit
+    onLayoutChange: (PanelLayout) -> Unit,
+    onAbout: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -63,7 +69,7 @@ fun CustomToolbar(
             MenuBarDropdown(
                 title = "Help",
                 items = listOf(
-                    MenuItem("About", Icons.Outlined.Info)
+                    MenuItem("About", Icons.Outlined.Info, onAbout)
                 )
             )
 
@@ -79,17 +85,18 @@ fun CustomToolbar(
             FloatingActionButton(
                 onClick = onRunClick,
                 modifier = Modifier.height(36.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.PlayArrow,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        painter = painterResource(Res.drawable.play_icon),
+                        contentDescription = "Run",
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.Unspecified
                     )
                 }
             }
@@ -103,9 +110,10 @@ fun CustomToolbar(
                 contentColor = MaterialTheme.colorScheme.onError
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Stop,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                    painter = painterResource(Res.drawable.stop_icon),
+                    contentDescription = "Stop",
+                    modifier = Modifier.size(18.dp),
+                    tint = Color.Unspecified
                 )
             }
         }
