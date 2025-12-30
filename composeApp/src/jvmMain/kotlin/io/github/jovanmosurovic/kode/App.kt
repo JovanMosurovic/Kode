@@ -28,7 +28,7 @@ fun App() {
 
     val editorViewModel = remember { EditorViewModel() }
     val consoleViewModel = remember { ConsoleViewModel() }
-    var currentLayout by remember { mutableStateOf(PanelLayout.HORIZONTAL_50_50) }
+    var currentLayout by remember { mutableStateOf(PanelLayout.VERTICAL_70_30) }
 
     KodeTheme {
         Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
