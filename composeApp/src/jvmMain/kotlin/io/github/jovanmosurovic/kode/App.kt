@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,10 +19,12 @@ import io.github.jovanmosurovic.kode.ui.dialogs.AboutDialog
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import io.github.jovanmosurovic.kode.ui.layout.MainLayout
 import io.github.jovanmosurovic.kode.ui.layout.PanelLayout
+import io.github.jovanmosurovic.kode.ui.menu.FileMenuActions
 import io.github.jovanmosurovic.kode.ui.menubar.CustomToolbar
 import io.github.jovanmosurovic.kode.ui.panels.console.ConsoleViewModel
 import io.github.jovanmosurovic.kode.ui.panels.editor.EditorViewModel
 import io.github.jovanmosurovic.kode.ui.theme.KodeTheme
+import io.github.jovanmosurovic.kode.utils.FileConstants
 
 @OptIn(ExperimentalSplitPaneApi::class)
 @Composable
@@ -32,13 +35,27 @@ fun App() {
     var currentLayout by remember { mutableStateOf(PanelLayout.HORIZONTAL_50_50) }
     var showAboutDialog by remember { mutableStateOf(false) }
 
+    val fileMenuActions = remember {
+        FileMenuActions(
+            getState = { editorViewModel.state.value },
+            updateState = { newState -> editorViewModel.updateState(newState) }
+        )
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            FileConstants.clearDefaultScript()
+        }
+    }
+
     KodeTheme {
         Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             CustomToolbar(
-                onRunClick = { println("Run clicked! ") },
-                onNewFile = { println("New file") },
-                onOpenFile = { println("Open file") },
-                onSaveFile = { println("Save file") },
+                onRunClick = { println("Run clicked!") },
+                onNewFile = { fileMenuActions.onNewFile() },
+                onOpenFile = { fileMenuActions.onOpenFile() },
+                onSaveFile = { fileMenuActions.onSave() },
+                onSaveFileAs = { fileMenuActions.onSaveAs() },
                 onExit = {},
                 currentLayout = currentLayout,
                 onLayoutChange = { currentLayout = it },

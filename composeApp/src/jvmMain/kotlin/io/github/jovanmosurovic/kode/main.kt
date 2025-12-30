@@ -7,6 +7,7 @@ import androidx.compose.ui.window.rememberWindowState
 import kode.composeapp.generated.resources.Res
 import kode.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import io.github.jovanmosurovic.kode.utils.FileConstants
 
 fun main() = application {
     Window(
@@ -17,4 +18,9 @@ fun main() = application {
     ) {
         App()
     }
+
+
+    Runtime.getRuntime().addShutdownHook(Thread {
+        FileConstants.clearDefaultScript()
+    })
 }

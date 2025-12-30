@@ -17,6 +17,10 @@ class EditorViewModel {
         ) }
     }
 
+    fun updateState(newState: EditorState) {
+        _state.value = newState
+    }
+
     fun clearCode() {
         _state.update { EditorState.initial() }
     }

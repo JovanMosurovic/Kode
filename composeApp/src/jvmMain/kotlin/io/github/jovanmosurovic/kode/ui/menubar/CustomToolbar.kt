@@ -27,6 +27,7 @@ fun CustomToolbar(
     onNewFile: () -> Unit,
     onOpenFile: () -> Unit,
     onSaveFile: () -> Unit,
+    onSaveFileAs: () -> Unit,
     onExit: () -> Unit,
     currentLayout: PanelLayout,
     onLayoutChange: (PanelLayout) -> Unit,
@@ -51,7 +52,7 @@ fun CustomToolbar(
                     MenuItem("Open", Icons.Outlined.FileOpen, onOpenFile),
                     MenuItem.Separator,
                     MenuItem("Save", Icons.Outlined.Save, onSaveFile),
-                    MenuItem("Save As", Icons.Outlined.SaveAs, onSaveFile),
+                    MenuItem("Save As", Icons.Outlined.SaveAs, onSaveFileAs),
                     MenuItem.Separator,
                     MenuItem("Exit", Icons.AutoMirrored.Outlined.ExitToApp, onExit)
                 )
