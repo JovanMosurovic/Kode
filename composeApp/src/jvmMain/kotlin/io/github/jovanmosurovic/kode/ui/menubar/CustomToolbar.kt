@@ -24,6 +24,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun CustomToolbar(
     onRunClick: () -> Unit,
+    onStopClick: () -> Unit,
     onNewFile: () -> Unit,
     onOpenFile: () -> Unit,
     onSaveFile: () -> Unit,
@@ -105,7 +106,7 @@ fun CustomToolbar(
             Spacer(modifier = Modifier.width(8.dp))
 
             FloatingActionButton(
-                onClick = {},
+                onClick = { onStopClick() },
                 modifier = Modifier.height(36.dp),
                 containerColor = MaterialTheme.colorScheme.error,
                 contentColor = MaterialTheme.colorScheme.onError
