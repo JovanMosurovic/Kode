@@ -8,6 +8,9 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import io.github.jovanmosurovic.kode.utils.AppInfo
 import io.github.jovanmosurovic.kode.utils.FileConstants
+import kode.composeapp.generated.resources.Res
+import kode.composeapp.generated.resources.app_icon_32x32
+import org.jetbrains.compose.resources.painterResource
 
 fun main() = application {
     val windowState = rememberWindowState(
@@ -19,7 +22,8 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = AppInfo.APP_NAME,
-        state = windowState
+        state = windowState,
+        icon = painterResource(Res.drawable.app_icon_32x32),
     ) {
         App(onCloseRequest = ::exitApplication)
     }

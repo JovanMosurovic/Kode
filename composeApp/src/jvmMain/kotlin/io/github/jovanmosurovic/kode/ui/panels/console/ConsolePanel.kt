@@ -4,12 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -17,11 +19,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.jovanmosurovic.kode.runner.CodeRunner
 import io.github.jovanmosurovic.kode.ui.panels.Panel
 import io.github.jovanmosurovic.kode.ui.theme.KodeTheme
 
 @Composable
 fun ConsolePanel(
+    codeRunner: CodeRunner,
     viewModel: ConsoleViewModel = remember { ConsoleViewModel() },
     modifier: Modifier = Modifier
 ) {
@@ -50,19 +54,21 @@ fun ConsolePanel(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                Text(
-                    text = formattedOutput,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState)
-                        .padding(8.dp),
-                    style = TextStyle(
-                        fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                        fontSize = 14.sp,
-                        color = editorColors.identifier,
-                        lineHeight = 20.sp
+                SelectionContainer {
+                    Text(
+                        text = formattedOutput,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(scrollState)
+                            .padding(8.dp),
+                        style = TextStyle(
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
+                            fontSize = 14.sp,
+                            color = editorColors.identifier,
+                            lineHeight = 20.sp
+                        )
                     )
-                )
+                }
             }
 
             // Input area
@@ -73,7 +79,17 @@ fun ConsolePanel(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(editorColors.lineNumberBackground)
-                        .padding(8.dp),
+                        .padding(8.dp)
+                        .onKeyEvent { keyEvent ->
+                            if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
+                                codeRunner.sendInput(state.input)
+                                viewModel.appendOutput("> ${state.input}\n")
+                                viewModel.updateInput("")
+                                true
+                            } else {
+                                false
+                            }
+                        },
                     textStyle = TextStyle(
                         fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
                         fontSize = 14.sp,
@@ -81,19 +97,18 @@ fun ConsolePanel(
                         lineHeight = 20.sp
                     ),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    singleLine = true,
                     decorationBox = { innerTextField ->
-                        Box {
-                            if (state.input.isEmpty()) {
-                                Text(
-                                    text = "> ",
-                                    style = TextStyle(
-                                        fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                                        fontSize = 14.sp,
-                                        color = editorColors.comment.copy(alpha = 0.6f),
-                                        lineHeight = 20.sp
-                                    )
+                        Row {
+                            Text(
+                                text = "> ",
+                                style = TextStyle(
+                                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
+                                    fontSize = 14.sp,
+                                    color = editorColors.function,
+                                    lineHeight = 20.sp
                                 )
-                            }
+                            )
                             innerTextField()
                         }
                     }

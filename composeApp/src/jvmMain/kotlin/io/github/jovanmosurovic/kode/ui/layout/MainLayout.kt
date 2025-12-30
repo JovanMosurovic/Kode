@@ -2,6 +2,7 @@ package io.github.jovanmosurovic.kode.ui.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
+import io.github.jovanmosurovic.kode.runner.CodeRunner
 import io.github.jovanmosurovic.kode.ui.panels.console.ConsolePanel
 import io.github.jovanmosurovic.kode.ui.panels.editor.CodeEditorPanel
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
@@ -28,6 +29,7 @@ enum class PanelLayout {
 fun MainLayout(
     editorViewModel: EditorViewModel,
     consoleViewModel: ConsoleViewModel,
+    codeRunner: CodeRunner,
     currentLayout: PanelLayout = PanelLayout.HORIZONTAL_50_50
 ) {
     when (currentLayout) {
@@ -36,7 +38,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.5f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
                 splitter { horizontalSplitter() }
             }
         }
@@ -46,7 +48,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.7f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
                 splitter { horizontalSplitter() }
             }
         }
@@ -56,7 +58,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.3f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
                 splitter { horizontalSplitter() }
             }
         }
@@ -66,7 +68,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.5f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
                 splitter { verticalSplitter() }
             }
         }
@@ -76,7 +78,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.7f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
                 splitter { verticalSplitter() }
             }
         }
@@ -86,7 +88,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.3f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
                 splitter { verticalSplitter() }
             }
         }

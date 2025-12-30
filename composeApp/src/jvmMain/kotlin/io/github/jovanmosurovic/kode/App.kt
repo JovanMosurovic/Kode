@@ -12,9 +12,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.jovanmosurovic.kode.runner.CodeRunner
 import io.github.jovanmosurovic.kode.ui.dialogs.AboutDialog
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import io.github.jovanmosurovic.kode.ui.layout.MainLayout
@@ -32,6 +34,9 @@ fun App(onCloseRequest: () -> Unit = {}) {
 
     val editorViewModel = remember { EditorViewModel() }
     val consoleViewModel = remember { ConsoleViewModel() }
+    val scope = rememberCoroutineScope()
+    val codeRunner = remember(consoleViewModel, scope) { CodeRunner(consoleViewModel, scope) }
+
     var currentLayout by remember { mutableStateOf(PanelLayout.HORIZONTAL_50_50) }
     var showAboutDialog by remember { mutableStateOf(false) }
 
@@ -51,7 +56,11 @@ fun App(onCloseRequest: () -> Unit = {}) {
     KodeTheme {
         Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             CustomToolbar(
-                onRunClick = { println("Run clicked!") },
+                onRunClick = {
+                    fileMenuActions.onSave()
+                    codeRunner.runKotlinScript(editorViewModel)
+                },
+                onStopClick = { codeRunner.stopExecution() },
                 onNewFile = { fileMenuActions.onNewFile() },
                 onOpenFile = { fileMenuActions.onOpenFile() },
                 onSaveFile = { fileMenuActions.onSave() },
@@ -73,7 +82,7 @@ fun App(onCloseRequest: () -> Unit = {}) {
                     .fillMaxSize()
                     .padding(4.dp)
             ) {
-                MainLayout(editorViewModel, consoleViewModel, currentLayout)
+                MainLayout(editorViewModel, consoleViewModel, codeRunner, currentLayout)
             }
         }
 
