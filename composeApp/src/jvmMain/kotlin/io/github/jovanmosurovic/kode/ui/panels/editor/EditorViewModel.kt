@@ -9,6 +9,9 @@ class EditorViewModel {
     private val _state = MutableStateFlow(EditorState.initial())
     val state: StateFlow<EditorState> = _state.asStateFlow()
 
+    private val _navigateToLine = MutableStateFlow<Pair<Int, Int>?>(null)
+    val navigateToLine: StateFlow<Pair<Int, Int>?> = _navigateToLine.asStateFlow()
+
     fun updateCode(newCode: String) {
         _state.update { it.copy(
             code = newCode,
@@ -36,5 +39,13 @@ class EditorViewModel {
 
     fun markAsSaved() {
         _state.update { it.copy(isDirty = false) }
+    }
+
+    fun navigateToPosition(line: Int, column: Int) {
+        _navigateToLine.value = Pair(line, column)
+    }
+
+    fun clearNavigation() {
+        _navigateToLine.value = null
     }
 }

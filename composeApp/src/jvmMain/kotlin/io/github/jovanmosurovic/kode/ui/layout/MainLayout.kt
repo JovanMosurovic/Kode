@@ -38,7 +38,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.5f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner, editorViewModel = editorViewModel) }
                 splitter { horizontalSplitter() }
             }
         }
@@ -48,7 +48,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.7f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner, editorViewModel = editorViewModel) }
                 splitter { horizontalSplitter() }
             }
         }
@@ -58,7 +58,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.3f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner, editorViewModel = editorViewModel) }
                 splitter { horizontalSplitter() }
             }
         }
@@ -68,7 +68,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.5f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner, editorViewModel = editorViewModel) }
                 splitter { verticalSplitter() }
             }
         }
@@ -78,7 +78,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.7f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner, editorViewModel = editorViewModel) }
                 splitter { verticalSplitter() }
             }
         }
@@ -88,7 +88,7 @@ fun MainLayout(
                 splitPaneState = rememberSplitPaneState(0.3f)
             ) {
                 first(minSize = 100.dp) { CodeEditorPanel(viewModel = editorViewModel) }
-                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner) }
+                second(minSize = 100.dp) { ConsolePanel(viewModel = consoleViewModel, codeRunner = codeRunner, editorViewModel = editorViewModel) }
                 splitter { verticalSplitter() }
             }
         }

@@ -1,10 +1,11 @@
 package io.github.jovanmosurovic.kode.ui.panels.console
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,21 +13,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jovanmosurovic.kode.runner.CodeRunner
 import io.github.jovanmosurovic.kode.ui.panels.Panel
+import io.github.jovanmosurovic.kode.ui.panels.editor.EditorViewModel
 import io.github.jovanmosurovic.kode.ui.theme.KodeTheme
 
 @Composable
 fun ConsolePanel(
     codeRunner: CodeRunner,
     viewModel: ConsoleViewModel = remember { ConsoleViewModel() },
+    editorViewModel: EditorViewModel? = null,
     modifier: Modifier = Modifier
 ) {
     Panel {
@@ -39,8 +47,12 @@ fun ConsolePanel(
             scrollState.animateScrollTo(scrollState.maxValue)
         }
 
-        val formattedOutput = remember(state.output, editorColors, errorColor) {
-            formatConsoleOutputNonComposable(state.output, editorColors, errorColor)
+        val errors = remember(state.output) {
+            ErrorParser.parseErrors(state.output)
+        }
+
+        val formattedOutput = remember(state.output, editorColors, errorColor, errors) {
+            formatConsoleOutputWithClickableErrors(state.output, editorColors, errorColor, errors)
         }
 
         Column(
@@ -54,21 +66,52 @@ fun ConsolePanel(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                SelectionContainer {
-                    Text(
-                        text = formattedOutput,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(scrollState)
-                            .padding(8.dp),
-                        style = TextStyle(
-                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                            fontSize = 14.sp,
-                            color = editorColors.identifier,
-                            lineHeight = 20.sp
+                val hasErrors = errors.isNotEmpty()
+                var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+
+                BasicText(
+                    text = formattedOutput,
+                    onTextLayout = { textLayoutResult = it },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(8.dp)
+                        .then(
+                            if (hasErrors) Modifier.pointerHoverIcon(PointerIcon.Hand)
+                            else Modifier
                         )
+                        .pointerInput(formattedOutput) {
+                            detectTapGestures { pos ->
+                                textLayoutResult?.let { layoutResult ->
+                                    val offset = layoutResult.getOffsetForPosition(pos)
+
+                                    val annotations = formattedOutput.getStringAnnotations(
+                                        tag = "ERROR",
+                                        start = offset,
+                                        end = offset + 1
+                                    )
+
+
+                                    annotations.firstOrNull()?.let { annotation ->
+                                        val parts = annotation.item.split(":")
+                                        if (parts.size >= 2) {
+                                            val line = parts[0].toIntOrNull()
+                                            val column = parts[1].toIntOrNull()
+                                            if (line != null && column != null) {
+                                                editorViewModel?.navigateToPosition(line, column)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                    style = TextStyle(
+                        fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
+                        fontSize = 14.sp,
+                        color = editorColors.identifier,
+                        lineHeight = 20.sp
                     )
-                }
+                )
             }
 
             // Input area
@@ -118,41 +161,76 @@ fun ConsolePanel(
     }
 }
 
-private fun formatConsoleOutputNonComposable(
+private fun formatConsoleOutputWithClickableErrors(
     output: String,
     editorColors: io.github.jovanmosurovic.kode.ui.theme.EditorColors,
-    errorColor: androidx.compose.ui.graphics.Color
+    errorColor: androidx.compose.ui.graphics.Color,
+    errors: List<ErrorLocation>
 ): AnnotatedString {
     return buildAnnotatedString {
-        val lines = output.lines()
+        var currentIndex = 0
 
-        lines.forEachIndexed { index, line ->
-            when {
-                line.startsWith("[ERROR]") || line.contains("error", ignoreCase = true) -> {
-                    withStyle(SpanStyle(color = errorColor)) {
-                        append(line)
-                    }
-                }
-                line.startsWith("[INFO]") || line.startsWith("INFO:") -> {
-                    withStyle(SpanStyle(color = editorColors.function)) {
-                        append(line)
-                    }
-                }
-                line.startsWith("[WARNING]") || line.contains("warning", ignoreCase = true) -> {
-                    withStyle(SpanStyle(color = editorColors.number)) {
-                        append(line)
-                    }
-                }
-                else -> {
-                    withStyle(SpanStyle(color = editorColors.identifier)) {
-                        append(line)
-                    }
-                }
+        errors.sortedBy { it.startIndex }.forEach { error ->
+            // Text before error
+            if (error.startIndex > currentIndex) {
+                val normalText = output.substring(currentIndex, error.startIndex)
+                appendNormalText(normalText, editorColors)
             }
 
-            if (index < lines.lastIndex) {
-                append("\n")
+            // Clickable error - capturing current length before appending
+            val errorText = output.substring(error.startIndex, error.endIndex)
+            val startAnnotation = this.length
+
+            withStyle(
+                SpanStyle(
+                    color = errorColor,
+                    textDecoration = TextDecoration.Underline
+                )
+            ) {
+                append(errorText)
             }
+
+            val endAnnotation = this.length
+
+            addStringAnnotation(
+                tag = "ERROR",
+                annotation = "${error.line}:${error.column}",
+                start = startAnnotation,
+                end = endAnnotation
+            )
+
+            currentIndex = error.endIndex
+        }
+
+        // Text after error
+        if (currentIndex < output.length) {
+            val remainingText = output.substring(currentIndex)
+            appendNormalText(remainingText, editorColors)
+        }
+    }
+}
+
+private fun AnnotatedString.Builder.appendNormalText(
+    text: String,
+    editorColors: io.github.jovanmosurovic.kode.ui.theme.EditorColors
+) {
+    val lines = text.lines()
+    lines.forEachIndexed { index, line ->
+        val color = when {
+            line.startsWith("[ERROR]") || line.contains("error", ignoreCase = true) -> {
+                editorColors.keyword
+            }
+            line.startsWith("[INFO]") || line.startsWith("INFO:") -> editorColors.function
+            line.startsWith("[WARNING]") || line.contains("warning", ignoreCase = true) -> editorColors.number
+            else -> editorColors.identifier
+        }
+
+        withStyle(SpanStyle(color = color)) {
+            append(line)
+        }
+
+        if (index < lines.lastIndex) {
+            append("\n")
         }
     }
 }

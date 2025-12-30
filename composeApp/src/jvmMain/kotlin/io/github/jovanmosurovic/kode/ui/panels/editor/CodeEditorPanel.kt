@@ -12,13 +12,18 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jovanmosurovic.kode.ui.panels.Panel
@@ -32,13 +37,56 @@ fun CodeEditorPanel(
 ) {
     Panel {
         val state by viewModel.state.collectAsState()
+        val navigateToLine by viewModel.navigateToLine.collectAsState()
         val scrollState = rememberScrollState()
         val syntaxHighlighter = rememberSyntaxHighlighter()
         val editorColors = KodeTheme.editorColors
         val scope = rememberCoroutineScope()
 
+        var textFieldValue by remember {
+            mutableStateOf(TextFieldValue(text = state.code))
+        }
+
+        LaunchedEffect(state.code) {
+            if (textFieldValue.text != state.code) {
+                textFieldValue = TextFieldValue(
+                    text = state.code,
+                    selection = TextRange(state.code.length)
+                )
+            }
+        }
+
         val highlightedCode = remember(state.code) {
             syntaxHighlighter.highlight(state.code)
+        }
+
+        // Navigation to the error line
+        LaunchedEffect(navigateToLine) {
+            navigateToLine?.let { (line, column) ->
+                val code = state.code
+                val lines = code.lines()
+
+                // Character offset for the given line and column
+                var offset = 0
+                for (i in 0 until (line - 1).coerceAtMost(lines.size - 1)) {
+                    offset += lines[i].length + 1 // +1 for newline
+                }
+                offset += (column - 1).coerceAtLeast(0).coerceAtMost(
+                    lines.getOrNull(line - 1)?.length ?: 0
+                )
+
+                // Update cursor position
+                textFieldValue = textFieldValue.copy(
+                    selection = TextRange(offset)
+                )
+
+                // Scroll to the line
+                val lineHeight = 20
+                val targetScroll = (line - 1) * lineHeight
+                scrollState.animateScrollTo(targetScroll.coerceAtLeast(0))
+
+                viewModel.clearNavigation()
+            }
         }
 
         Row(
@@ -70,11 +118,14 @@ fun CodeEditorPanel(
                 )
 
                 BasicTextField(
-                    value = state.code,
-                    onValueChange = { newCode ->
-                        viewModel.updateCode(newCode)
+                    value = textFieldValue,
+                    onValueChange = { newValue ->
+                        textFieldValue = newValue
+                        if (newValue.text != state.code) {
+                            viewModel.updateCode(newValue.text)
+                        }
 
-                        val lines = newCode.count { it == '\n' }
+                        val lines = newValue.text.count { it == '\n' }
                         val lineHeight = 20
                         val targetScroll = lines * lineHeight
 
