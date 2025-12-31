@@ -90,6 +90,8 @@ fun CodeEditorPanel(
                     selection = TextRange(offset)
                 )
 
+                viewModel.updateCursorPosition(offset, code)
+
                 val lineHeight = 20
                 val targetScroll = (line - 1) * lineHeight
                 scrollState.animateScrollTo(targetScroll.coerceAtLeast(0))
