@@ -33,13 +33,13 @@ fun LineNumbers(
             Text(
                 text = "${index + 1}",
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     color = editorColors.lineNumber
                 ),
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(20.dp)
+                    .height(24.dp)
             )
         }
     }

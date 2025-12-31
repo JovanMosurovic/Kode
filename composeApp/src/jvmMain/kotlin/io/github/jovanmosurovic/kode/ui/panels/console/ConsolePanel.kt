@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -74,8 +75,8 @@ fun ConsolePanel(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                val hasErrors = errors.isNotEmpty()
                 var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+                var hoveredErrorIndex by remember { mutableStateOf<Int?>(null) }
 
                 BasicText(
                     text = formattedOutput,
@@ -84,10 +85,41 @@ fun ConsolePanel(
                         .fillMaxSize()
                         .verticalScroll(scrollState)
                         .padding(8.dp)
-                        .then(
-                            if (hasErrors) Modifier.pointerHoverIcon(PointerIcon.Hand)
-                            else Modifier
+                        .pointerHoverIcon(
+                            if (hoveredErrorIndex != null) PointerIcon.Hand
+                            else PointerIcon.Default
                         )
+                        .pointerInput(formattedOutput) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+
+                                    when (event.type) {
+                                        // Tracking hover
+                                        androidx.compose.ui.input.pointer.PointerEventType.Move -> {
+                                            val position = event.changes.first().position
+                                            textLayoutResult?.let { layoutResult ->
+                                                val offset = layoutResult.getOffsetForPosition(position)
+                                                val annotations = formattedOutput.getStringAnnotations(
+                                                    tag = "ERROR",
+                                                    start = offset,
+                                                    end = offset + 1
+                                                )
+                                                hoveredErrorIndex = annotations.firstOrNull()?.let {
+                                                    errors.indexOfFirst { error ->
+                                                        "${error.line}:${error.column}" == it.item
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        // Handle exit
+                                        androidx.compose.ui.input.pointer.PointerEventType.Exit -> {
+                                            hoveredErrorIndex = null
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         .pointerInput(formattedOutput) {
                             detectTapGestures { pos ->
                                 textLayoutResult?.let { layoutResult ->
@@ -98,7 +130,6 @@ fun ConsolePanel(
                                         start = offset,
                                         end = offset + 1
                                     )
-
 
                                     annotations.firstOrNull()?.let { annotation ->
                                         val parts = annotation.item.split(":")
@@ -116,7 +147,7 @@ fun ConsolePanel(
                     style = TextStyle(
                         fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
                         fontSize = 14.sp,
-                        color = editorColors.identifier,
+                        color = normalTextColor,
                         lineHeight = 20.sp
                     )
                 )
@@ -124,6 +155,12 @@ fun ConsolePanel(
 
             // Input area
             if (state.isRunning) {
+                val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
+
+                LaunchedEffect(state.isRunning) {
+                    focusRequester.requestFocus()
+                }
+
                 BasicTextField(
                     value = state.input,
                     onValueChange = { viewModel.updateInput(it) },
@@ -131,6 +168,7 @@ fun ConsolePanel(
                         .fillMaxWidth()
                         .background(editorColors.lineNumberBackground)
                         .padding(8.dp)
+                        .focusRequester(focusRequester)
                         .onKeyEvent { keyEvent ->
                             if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
                                 codeRunner.sendInput(state.input)

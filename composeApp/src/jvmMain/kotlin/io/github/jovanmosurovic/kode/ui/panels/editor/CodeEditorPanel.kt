@@ -66,7 +66,6 @@ fun CodeEditorPanel(
                 val code = state.code
                 val lines = code.lines()
 
-                // Character offset for the given line and column
                 var offset = 0
                 for (i in 0 until (line - 1).coerceAtMost(lines.size - 1)) {
                     offset += lines[i].length + 1
@@ -75,12 +74,10 @@ fun CodeEditorPanel(
                     lines.getOrNull(line - 1)?.length ?: 0
                 )
 
-                // Update cursor position
                 textFieldValue = textFieldValue.copy(
                     selection = TextRange(offset)
                 )
 
-                // Scroll to the line
                 val lineHeight = 20
                 val targetScroll = (line - 1) * lineHeight
                 scrollState.animateScrollTo(targetScroll.coerceAtLeast(0))
@@ -112,8 +109,8 @@ fun CodeEditorPanel(
                         .padding(8.dp),
                     style = TextStyle(
                         fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp
                     )
                 )
 
@@ -141,9 +138,9 @@ fun CodeEditorPanel(
                         .padding(8.dp),
                     textStyle = TextStyle(
                         fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         color = editorColors.identifier.copy(alpha = 0f),
-                        lineHeight = 20.sp
+                        lineHeight = 24.sp
                     ),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     decorationBox = { innerTextField ->
@@ -153,9 +150,9 @@ fun CodeEditorPanel(
                                     text = "// Write your Kotlin code here...",
                                     style = TextStyle(
                                         fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                                        fontSize = 14.sp,
+                                        fontSize = 16.sp,
                                         color = editorColors.comment.copy(alpha = 0.6f),
-                                        lineHeight = 20.sp
+                                        lineHeight = 24.sp
                                     )
                                 )
                             }
