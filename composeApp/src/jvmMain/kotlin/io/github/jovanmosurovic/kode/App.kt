@@ -9,6 +9,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.jovanmosurovic.kode.runner.CodeRunner
+import io.github.jovanmosurovic.kode.ui.components.StatusBar
 import io.github.jovanmosurovic.kode.ui.dialogs.AboutDialog
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import io.github.jovanmosurovic.kode.ui.layout.MainLayout
@@ -36,6 +38,7 @@ fun App(onCloseRequest: () -> Unit = {}) {
     val consoleViewModel = remember { ConsoleViewModel() }
     val scope = rememberCoroutineScope()
     val codeRunner = remember(consoleViewModel, scope) { CodeRunner(consoleViewModel, scope) }
+    val editorState by editorViewModel.state.collectAsState()
 
     var currentLayout by remember { mutableStateOf(PanelLayout.HORIZONTAL_50_50) }
     var showAboutDialog by remember { mutableStateOf(false) }
@@ -79,11 +82,22 @@ fun App(onCloseRequest: () -> Unit = {}) {
 
             Box(
                 modifier = Modifier
+                    .weight(1f)
                     .fillMaxSize()
                     .padding(4.dp)
             ) {
                 MainLayout(editorViewModel, consoleViewModel, codeRunner, currentLayout)
             }
+
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                thickness = 1.dp
+            )
+
+            StatusBar(
+                line = editorState.cursorLine,
+                column = editorState.cursorColumn
+            )
         }
 
         if (showAboutDialog) {

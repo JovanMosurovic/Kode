@@ -8,6 +8,8 @@ data class EditorState(
     val currentFile: String = FileConstants.defaultScriptPath,
     val lineCount: Int = 1,
     val columnCount: Int = 1,
+    val cursorLine: Int = 1,
+    val cursorColumn: Int = 1
 ) {
     companion object {
         fun initial(): EditorState {

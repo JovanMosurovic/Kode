@@ -69,7 +69,7 @@ fun CodeEditorPanel(
                 // Character offset for the given line and column
                 var offset = 0
                 for (i in 0 until (line - 1).coerceAtMost(lines.size - 1)) {
-                    offset += lines[i].length + 1 // +1 for newline
+                    offset += lines[i].length + 1
                 }
                 offset += (column - 1).coerceAtLeast(0).coerceAtMost(
                     lines.getOrNull(line - 1)?.length ?: 0
@@ -124,6 +124,8 @@ fun CodeEditorPanel(
                         if (newValue.text != state.code) {
                             viewModel.updateCode(newValue.text)
                         }
+
+                        viewModel.updateCursorPosition(newValue.selection.start, newValue.text)
 
                         val lines = newValue.text.count { it == '\n' }
                         val lineHeight = 20

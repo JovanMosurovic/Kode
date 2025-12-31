@@ -20,6 +20,18 @@ class EditorViewModel {
         ) }
     }
 
+    fun updateCursorPosition(offset: Int, text: String) {
+        val lines = text.substring(0, offset.coerceAtMost(text.length)).lines()
+        val line = lines.size
+        val column = lines.lastOrNull()?.length?.plus(1) ?: 1
+
+        _state.update { it.copy(
+            cursorLine = line,
+            cursorColumn = column
+        ) }
+    }
+
+
     fun updateState(newState: EditorState) {
         _state.value = newState
     }
