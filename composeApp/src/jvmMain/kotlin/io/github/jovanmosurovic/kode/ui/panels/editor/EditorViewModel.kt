@@ -12,6 +12,9 @@ class EditorViewModel {
     private val _navigateToLine = MutableStateFlow<Pair<Int, Int>?>(null)
     val navigateToLine: StateFlow<Pair<Int, Int>?> = _navigateToLine.asStateFlow()
 
+    private val _requestFocus = MutableStateFlow(false)
+    val requestFocus: StateFlow<Boolean> = _requestFocus.asStateFlow()
+
     fun updateCode(newCode: String) {
         _state.update { it.copy(
             code = newCode,
@@ -30,7 +33,6 @@ class EditorViewModel {
             cursorColumn = column
         ) }
     }
-
 
     fun updateState(newState: EditorState) {
         _state.value = newState
@@ -55,9 +57,14 @@ class EditorViewModel {
 
     fun navigateToPosition(line: Int, column: Int) {
         _navigateToLine.value = Pair(line, column)
+        _requestFocus.value = true
     }
 
     fun clearNavigation() {
         _navigateToLine.value = null
+    }
+
+    fun clearFocusRequest() {
+        _requestFocus.value = false
     }
 }

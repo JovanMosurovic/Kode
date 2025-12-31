@@ -20,6 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -38,10 +40,12 @@ fun CodeEditorPanel(
     Panel {
         val state by viewModel.state.collectAsState()
         val navigateToLine by viewModel.navigateToLine.collectAsState()
+        val requestFocus by viewModel.requestFocus.collectAsState()
         val scrollState = rememberScrollState()
         val syntaxHighlighter = rememberSyntaxHighlighter()
         val editorColors = KodeTheme.editorColors
         val scope = rememberCoroutineScope()
+        val focusRequester = remember { FocusRequester() }
 
         var textFieldValue by remember {
             mutableStateOf(TextFieldValue(text = state.code))
@@ -58,6 +62,14 @@ fun CodeEditorPanel(
 
         val highlightedCode = remember(state.code) {
             syntaxHighlighter.highlight(state.code)
+        }
+
+        // Handle focus request
+        LaunchedEffect(requestFocus) {
+            if (requestFocus) {
+                focusRequester.requestFocus()
+                viewModel.clearFocusRequest()
+            }
         }
 
         // Navigation to the error line
@@ -135,7 +147,8 @@ fun CodeEditorPanel(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(scrollState)
-                        .padding(8.dp),
+                        .padding(8.dp)
+                        .focusRequester(focusRequester),
                     textStyle = TextStyle(
                         fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
                         fontSize = 16.sp,
