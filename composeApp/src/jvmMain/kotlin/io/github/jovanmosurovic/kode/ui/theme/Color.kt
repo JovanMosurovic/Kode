@@ -37,10 +37,13 @@ val onErrorLight = Color(0xFFFFFFFF)
 val errorContainerLight = Color(0xFFFFDAD6)
 val onErrorContainerLight = Color(0xFF410002)
 
-val errorDark = Color(0xFFB54747) //0xFFE56C6C
+val errorDark = Color(0xFFF75464) //0xFFE56C6C
 val onErrorDark = Color(0xFFFFFFFF)
 val errorContainerDark = Color(0xFF93000A)
 val onErrorContainerDark = Color(0xFFFFDAD6)
+
+val warningLight = Color(0xFFF57C00)
+val warningDark = Color(0xFFFFB74D)
 
 val backgroundLight = Color(0xFFFDFCFF)
 val onBackgroundLight = Color(0xFF1A1C1E)

@@ -108,7 +108,7 @@ fun CustomToolbar(
             FloatingActionButton(
                 onClick = { onStopClick() },
                 modifier = Modifier.height(36.dp),
-                containerColor = MaterialTheme.colorScheme.error,
+                containerColor = Color(0xFFB54747),
                 contentColor = MaterialTheme.colorScheme.onError
             ) {
                 Icon(

@@ -42,6 +42,8 @@ fun ConsolePanel(
         val scrollState = rememberScrollState()
         val editorColors = KodeTheme.editorColors
         val errorColor = MaterialTheme.colorScheme.error
+        val warningColor = editorColors.warning
+        val normalTextColor = MaterialTheme.colorScheme.onSurface
 
         LaunchedEffect(state.output) {
             scrollState.animateScrollTo(scrollState.maxValue)
@@ -51,8 +53,14 @@ fun ConsolePanel(
             ErrorParser.parseErrors(state.output)
         }
 
-        val formattedOutput = remember(state.output, editorColors, errorColor, errors) {
-            formatConsoleOutputWithClickableErrors(state.output, editorColors, errorColor, errors)
+        val formattedOutput = remember(state.output, errorColor, warningColor, normalTextColor, errors) {
+            formatConsoleOutputWithClickableErrors(
+                state.output,
+                errorColor,
+                warningColor,
+                normalTextColor,
+                errors
+            )
         }
 
         Column(
@@ -163,8 +171,9 @@ fun ConsolePanel(
 
 private fun formatConsoleOutputWithClickableErrors(
     output: String,
-    editorColors: io.github.jovanmosurovic.kode.ui.theme.EditorColors,
     errorColor: androidx.compose.ui.graphics.Color,
+    warningColor: androidx.compose.ui.graphics.Color,
+    normalTextColor: androidx.compose.ui.graphics.Color,
     errors: List<ErrorLocation>
 ): AnnotatedString {
     return buildAnnotatedString {
@@ -174,7 +183,7 @@ private fun formatConsoleOutputWithClickableErrors(
             // Text before error
             if (error.startIndex > currentIndex) {
                 val normalText = output.substring(currentIndex, error.startIndex)
-                appendNormalText(normalText, editorColors)
+                appendNormalText(normalText, errorColor, warningColor, normalTextColor)
             }
 
             // Clickable error - capturing current length before appending
@@ -205,24 +214,23 @@ private fun formatConsoleOutputWithClickableErrors(
         // Text after error
         if (currentIndex < output.length) {
             val remainingText = output.substring(currentIndex)
-            appendNormalText(remainingText, editorColors)
+            appendNormalText(remainingText, errorColor, warningColor, normalTextColor)
         }
     }
 }
 
 private fun AnnotatedString.Builder.appendNormalText(
     text: String,
-    editorColors: io.github.jovanmosurovic.kode.ui.theme.EditorColors
+    errorColor: androidx.compose.ui.graphics.Color,
+    warningColor: androidx.compose.ui.graphics.Color,
+    normalTextColor: androidx.compose.ui.graphics.Color
 ) {
     val lines = text.lines()
     lines.forEachIndexed { index, line ->
         val color = when {
-            line.startsWith("[ERROR]") || line.contains("error", ignoreCase = true) -> {
-                editorColors.keyword
-            }
-            line.startsWith("[INFO]") || line.startsWith("INFO:") -> editorColors.function
-            line.startsWith("[WARNING]") || line.contains("warning", ignoreCase = true) -> editorColors.number
-            else -> editorColors.identifier
+            line.startsWith("[ERROR]") || line.contains("error", ignoreCase = true) -> errorColor
+            line.startsWith("[WARNING]") || line.contains("warning", ignoreCase = true) -> warningColor
+            else -> normalTextColor
         }
 
         withStyle(SpanStyle(color = color)) {

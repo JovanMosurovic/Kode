@@ -18,7 +18,8 @@ data class EditorColors(
     val bracket: Color,
     val background: Color,
     val lineNumberBackground: Color,
-    val lineNumber: Color
+    val lineNumber: Color,
+    val warning: Color
 )
 
 val LocalEditorColors = staticCompositionLocalOf {
@@ -34,7 +35,8 @@ val LocalEditorColors = staticCompositionLocalOf {
         bracket = Color.Unspecified,
         background = Color.Unspecified,
         lineNumberBackground = Color.Unspecified,
-        lineNumber = Color.Unspecified
+        lineNumber = Color.Unspecified,
+        warning = Color.Unspecified
     )
 }
 
@@ -104,7 +106,8 @@ private val LightEditorColors = EditorColors(
     bracket = codeBracketLight,
     background = codeEditorBackgroundLight,
     lineNumberBackground = codeLineNumberBackgroundLight,
-    lineNumber = codeLineNumberLight
+    lineNumber = codeLineNumberLight,
+    warning = warningLight
 )
 
 private val DarkEditorColors = EditorColors(
@@ -119,7 +122,8 @@ private val DarkEditorColors = EditorColors(
     bracket = codeBracketDark,
     background = codeEditorBackgroundDark,
     lineNumberBackground = codeLineNumberBackgroundDark,
-    lineNumber = codeLineNumberDark
+    lineNumber = codeLineNumberDark,
+    warning = warningDark
 )
 
 @Composable
