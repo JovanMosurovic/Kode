@@ -71,6 +71,8 @@ fun App(onCloseRequest: () -> Unit = {}) {
                 onSaveFile = { fileMenuActions.onSave() },
                 onSaveFileAs = { fileMenuActions.onSaveAs() },
                 onExit = onCloseRequest,
+                onPaste = { editorViewModel.paste() },
+                onSelectAll = { editorViewModel.selectAll() },
                 currentLayout = currentLayout,
                 onLayoutChange = { currentLayout = it },
                 onAbout = { showAboutDialog = true },

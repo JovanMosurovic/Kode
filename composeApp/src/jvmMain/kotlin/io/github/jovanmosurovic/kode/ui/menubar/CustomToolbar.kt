@@ -30,6 +30,8 @@ fun CustomToolbar(
     onSaveFile: () -> Unit,
     onSaveFileAs: () -> Unit,
     onExit: () -> Unit,
+    onPaste: () -> Unit,
+    onSelectAll: () -> Unit,
     currentLayout: PanelLayout,
     onLayoutChange: (PanelLayout) -> Unit,
     onLiveTemplatesHelp: () -> Unit,
@@ -63,9 +65,8 @@ fun CustomToolbar(
             MenuBarDropdown(
                 title = "Edit",
                 items = listOf(
-                    MenuItem("Cut", Icons.Outlined.ContentCut),
-                    MenuItem("Copy", Icons.Outlined.ContentCopy),
-                    MenuItem("Paste", Icons.Outlined.ContentPaste)
+                    MenuItem("Paste", Icons.Outlined.ContentPaste, onPaste),
+                    MenuItem("Select All", Icons.Outlined.SelectAll, onSelectAll)
                 )
             )
 

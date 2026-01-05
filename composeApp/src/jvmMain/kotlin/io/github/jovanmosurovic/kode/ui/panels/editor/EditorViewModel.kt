@@ -1,4 +1,5 @@
 package io.github.jovanmosurovic.kode.ui.panels.editor
+
 import io.github.jovanmosurovic.kode.ui.panels.editor.templates.LiveTemplate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +16,12 @@ class EditorViewModel {
 
     private val _requestFocus = MutableStateFlow(false)
     val requestFocus: StateFlow<Boolean> = _requestFocus.asStateFlow()
+
+    private val _requestSelectAll = MutableStateFlow(false)
+    val requestSelectAll: StateFlow<Boolean> = _requestSelectAll.asStateFlow()
+
+    private val _requestPaste = MutableStateFlow(false)
+    val requestPaste: StateFlow<Boolean> = _requestPaste.asStateFlow()
 
     fun updateCode(newCode: String) {
         _state.update { it.copy(
@@ -50,6 +57,33 @@ class EditorViewModel {
 
     fun clearFocusRequest() {
         _requestFocus.value = false
+    }
+
+    fun selectAll() {
+        _requestSelectAll.value = true
+        _requestFocus.value = true
+    }
+
+    fun clearSelectAllRequest() {
+        _requestSelectAll.value = false
+    }
+
+    fun paste() {
+        _requestPaste.value = true
+        _requestFocus.value = true
+    }
+
+    fun clearPasteRequest() {
+        _requestPaste.value = false
+    }
+
+    fun getClipboardContent(): String? {
+        return try {
+            val clipboard = java.awt.Toolkit.getDefaultToolkit().systemClipboard
+            clipboard.getData(java.awt.datatransfer.DataFlavor.stringFlavor) as? String
+        } catch (_: Exception) {
+            null
+        }
     }
 
     fun checkAndShowTemplatePopup(cursorOffset: Int) {

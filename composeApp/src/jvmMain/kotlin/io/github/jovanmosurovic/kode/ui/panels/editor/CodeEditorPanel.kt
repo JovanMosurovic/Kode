@@ -57,6 +57,8 @@ fun CodeEditorPanel(
         val state by viewModel.state.collectAsState()
         val navigateToLine by viewModel.navigateToLine.collectAsState()
         val requestFocus by viewModel.requestFocus.collectAsState()
+        val requestSelectAll by viewModel.requestSelectAll.collectAsState()
+        val requestPaste by viewModel.requestPaste.collectAsState()
         val scrollState = rememberScrollState()
         val syntaxHighlighter = rememberSyntaxHighlighter()
         val editorColors = KodeTheme.editorColors
@@ -80,7 +82,31 @@ fun CodeEditorPanel(
             }
         }
 
-        // Navigation to error line
+        // Select All
+        LaunchedEffect(requestSelectAll) {
+            if (requestSelectAll) {
+                focusRequester.requestFocus()
+                textFieldValue = textFieldValue.copy(selection = TextRange(0, textFieldValue.text.length))
+                viewModel.clearSelectAllRequest()
+            }
+        }
+
+        // Paste
+        LaunchedEffect(requestPaste) {
+            if (requestPaste) {
+                focusRequester.requestFocus()
+                viewModel.getClipboardContent()?.let { clipboardText ->
+                    val selection = textFieldValue.selection
+                    val newText = textFieldValue.text.replaceRange(selection.start, selection.end, clipboardText)
+                    val newCursor = selection.start + clipboardText.length
+                    textFieldValue = TextFieldValue(text = newText, selection = TextRange(newCursor))
+                    viewModel.updateCode(newText)
+                }
+                viewModel.clearPasteRequest()
+            }
+        }
+
+        // Navigation to the error line
         LaunchedEffect(navigateToLine) {
             navigateToLine?.let { (line, column) ->
                 val offset = calculateOffset(state.code, line, column)
