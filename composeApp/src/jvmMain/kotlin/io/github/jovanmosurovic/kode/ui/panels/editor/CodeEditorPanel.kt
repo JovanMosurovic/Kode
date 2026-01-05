@@ -23,12 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jovanmosurovic.kode.ui.panels.Panel
+import io.github.jovanmosurovic.kode.ui.panels.editor.templates.LiveTemplatePopup
 import io.github.jovanmosurovic.kode.ui.theme.KodeTheme
 import kotlinx.coroutines.launch
 
@@ -47,8 +52,69 @@ fun CodeEditorPanel(
         val scope = rememberCoroutineScope()
         val focusRequester = remember { FocusRequester() }
 
+        var editorPosition by remember { mutableStateOf(IntOffset.Zero) }
+
         var textFieldValue by remember {
             mutableStateOf(TextFieldValue(text = state.code))
+        }
+
+        // Key event handler function
+        val handleKeyEvent: (KeyEvent) -> Boolean = { keyEvent ->
+            if (keyEvent.type == KeyEventType.KeyDown) {
+                when {
+                    // Ctrl+Space to show templates
+                    keyEvent.key == Key.Spacebar && keyEvent.isCtrlPressed -> {
+                        viewModel.showTemplatePopup(textFieldValue.selection.start)
+                        true
+                    }
+                    // Tab to apply first/selected template
+                    keyEvent.key == Key.Tab && state.showTemplatePopup -> {
+                        val template = state.matchingTemplates.getOrNull(state.selectedTemplateIndex)
+                        if (template != null) {
+                            val (newCode, newCursor) = viewModel.applyTemplate(
+                                template,
+                                textFieldValue.selection.start
+                            )
+                            textFieldValue = TextFieldValue(
+                                text = newCode,
+                                selection = TextRange(newCursor)
+                            )
+                        }
+                        true
+                    }
+                    // Arrow down
+                    keyEvent.key == Key.DirectionDown && state.showTemplatePopup -> {
+                        viewModel.selectNextTemplate()
+                        true
+                    }
+                    // Arrow up
+                    keyEvent.key == Key.DirectionUp && state.showTemplatePopup -> {
+                        viewModel.selectPreviousTemplate()
+                        true
+                    }
+                    // Enter to apply selected
+                    keyEvent.key == Key.Enter && state.showTemplatePopup -> {
+                        val template = state.matchingTemplates.getOrNull(state.selectedTemplateIndex)
+                        if (template != null) {
+                            val (newCode, newCursor) = viewModel.applyTemplate(
+                                template,
+                                textFieldValue.selection.start
+                            )
+                            textFieldValue = TextFieldValue(
+                                text = newCode,
+                                selection = TextRange(newCursor)
+                            )
+                        }
+                        true
+                    }
+                    // Escape to close
+                    keyEvent.key == Key.Escape && state.showTemplatePopup -> {
+                        viewModel.hideTemplatePopup()
+                        true
+                    }
+                    else -> false
+                }
+            } else false
         }
 
         LaunchedEffect(state.code) {
@@ -100,80 +166,122 @@ fun CodeEditorPanel(
             }
         }
 
-        Row(
+        // Popup position
+        val popupPosition = remember(state.cursorLine, state.cursorColumn, editorPosition) {
+            val lineHeight = 24
+            val charWidth = 9
+            IntOffset(
+                x = editorPosition.x + 58 + (state.cursorColumn * charWidth),
+                y = editorPosition.y + (state.cursorLine * lineHeight) - scrollState.value + 20
+            )
+        }
+
+        Box(
             modifier = modifier
                 .fillMaxSize()
-                .background(editorColors.background)
+                .onPreviewKeyEvent(handleKeyEvent)
         ) {
-            LineNumbers(
-                lineCount = state.lineCount,
-                scrollState = scrollState
-            )
-
-            Box(
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
+                    .fillMaxSize()
+                    .background(editorColors.background)
+                    .onGloballyPositioned { coordinates ->
+                        val position = coordinates.positionInRoot()
+                        editorPosition = IntOffset(position.x.toInt(), position.y.toInt())
+                    }
             ) {
-                Text(
-                    text = highlightedCode,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState, enabled = false)
-                        .padding(8.dp),
-                    style = TextStyle(
-                        fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp
-                    )
+                LineNumbers(
+                    lineCount = state.lineCount,
+                    scrollState = scrollState
                 )
 
-                BasicTextField(
-                    value = textFieldValue,
-                    onValueChange = { newValue ->
-                        textFieldValue = newValue
-                        if (newValue.text != state.code) {
-                            viewModel.updateCode(newValue.text)
-                        }
-
-                        viewModel.updateCursorPosition(newValue.selection.start, newValue.text)
-
-                        val lines = newValue.text.count { it == '\n' }
-                        val lineHeight = 20
-                        val targetScroll = lines * lineHeight
-
-                        scope.launch {
-                            scrollState.animateScrollTo(targetScroll.coerceAtLeast(0))
-                        }
-                    },
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState)
-                        .padding(8.dp)
-                        .focusRequester(focusRequester),
-                    textStyle = TextStyle(
-                        fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                        fontSize = 16.sp,
-                        color = editorColors.identifier.copy(alpha = 0f),
-                        lineHeight = 24.sp
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    decorationBox = { innerTextField ->
-                        Box {
-                            if (state.code.isEmpty()) {
-                                Text(
-                                    text = "// Write your Kotlin code here...",
-                                    style = TextStyle(
-                                        fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-                                        fontSize = 16.sp,
-                                        color = editorColors.comment.copy(alpha = 0.6f),
-                                        lineHeight = 24.sp
-                                    )
-                                )
+                        .weight(1f)
+                        .fillMaxHeight()
+                ) {
+                    Text(
+                        text = highlightedCode,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(scrollState, enabled = false)
+                            .padding(8.dp),
+                        style = TextStyle(
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
+                            fontSize = 16.sp,
+                            lineHeight = 24.sp
+                        )
+                    )
+
+                    BasicTextField(
+                        value = textFieldValue,
+                        onValueChange = { newValue ->
+                            textFieldValue = newValue
+                            if (newValue.text != state.code) {
+                                viewModel.updateCode(newValue.text)
                             }
-                            innerTextField()
+
+                            viewModel.updateCursorPosition(newValue.selection.start, newValue.text)
+
+                            viewModel.checkAndShowTemplatePopup(newValue.selection.start)
+
+                            val lines = newValue.text.count { it == '\n' }
+                            val lineHeight = 20
+                            val targetScroll = lines * lineHeight
+
+                            scope.launch {
+                                scrollState.animateScrollTo(targetScroll.coerceAtLeast(0))
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(scrollState)
+                            .padding(8.dp)
+                            .focusRequester(focusRequester),
+                        textStyle = TextStyle(
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
+                            fontSize = 16.sp,
+                            color = editorColors.identifier.copy(alpha = 0f),
+                            lineHeight = 24.sp
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        decorationBox = { innerTextField ->
+                            Box {
+                                if (state.code.isEmpty()) {
+                                    Text(
+                                        text = "// Write your Kotlin code here...",
+                                        style = TextStyle(
+                                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
+                                            fontSize = 16.sp,
+                                            color = editorColors.comment.copy(alpha = 0.6f),
+                                            lineHeight = 24.sp
+                                        )
+                                    )
+                                }
+                                innerTextField()
+                            }
                         }
-                    }
+                    )
+                }
+            }
+
+            // Live template popup
+            if (state.showTemplatePopup && state.matchingTemplates.isNotEmpty()) {
+                LiveTemplatePopup(
+                    templates = state.matchingTemplates,
+                    selectedIndex = state.selectedTemplateIndex,
+                    onSelect = { template ->
+                        val (newCode, newCursor) = viewModel.applyTemplate(
+                            template,
+                            textFieldValue.selection.start
+                        )
+                        textFieldValue = TextFieldValue(
+                            text = newCode,
+                            selection = TextRange(newCursor)
+                        )
+                    },
+                    onDismiss = { viewModel.hideTemplatePopup() },
+                    position = popupPosition
                 )
             }
         }

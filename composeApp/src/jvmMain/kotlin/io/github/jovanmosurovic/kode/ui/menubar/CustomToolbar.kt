@@ -32,6 +32,7 @@ fun CustomToolbar(
     onExit: () -> Unit,
     currentLayout: PanelLayout,
     onLayoutChange: (PanelLayout) -> Unit,
+    onLiveTemplatesHelp: () -> Unit,
     onAbout: () -> Unit
 ) {
     Surface(
@@ -71,6 +72,8 @@ fun CustomToolbar(
             MenuBarDropdown(
                 title = "Help",
                 items = listOf(
+                    MenuItem("Live Templates", Icons.Outlined.Code, onLiveTemplatesHelp),
+                    MenuItem.Separator,
                     MenuItem("About", Icons.Outlined.Info, onAbout)
                 )
             )

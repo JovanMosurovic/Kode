@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import io.github.jovanmosurovic.kode.runner.CodeRunner
 import io.github.jovanmosurovic.kode.ui.components.StatusBar
 import io.github.jovanmosurovic.kode.ui.dialogs.AboutDialog
+import io.github.jovanmosurovic.kode.ui.dialogs.LiveTemplatesHelpDialog
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import io.github.jovanmosurovic.kode.ui.layout.MainLayout
 import io.github.jovanmosurovic.kode.ui.layout.PanelLayout
@@ -41,6 +42,7 @@ fun App(onCloseRequest: () -> Unit = {}) {
     val editorState by editorViewModel.state.collectAsState()
 
     var currentLayout by remember { mutableStateOf(PanelLayout.HORIZONTAL_50_50) }
+    var showLiveTemplatesDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
 
     val fileMenuActions = remember {
@@ -71,7 +73,8 @@ fun App(onCloseRequest: () -> Unit = {}) {
                 onExit = onCloseRequest,
                 currentLayout = currentLayout,
                 onLayoutChange = { currentLayout = it },
-                onAbout = { showAboutDialog = true }
+                onAbout = { showAboutDialog = true },
+                onLiveTemplatesHelp = { showLiveTemplatesDialog = true }
             )
 
             HorizontalDivider(
@@ -98,6 +101,10 @@ fun App(onCloseRequest: () -> Unit = {}) {
                 line = editorState.cursorLine,
                 column = editorState.cursorColumn
             )
+        }
+
+        if (showLiveTemplatesDialog) {
+            LiveTemplatesHelpDialog(onDismiss = { showLiveTemplatesDialog = false })
         }
 
         if (showAboutDialog) {

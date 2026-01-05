@@ -1,4 +1,5 @@
 package io.github.jovanmosurovic.kode.ui.panels.editor
+import io.github.jovanmosurovic.kode.ui.panels.editor.templates.LiveTemplate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,5 +67,107 @@ class EditorViewModel {
 
     fun clearFocusRequest() {
         _requestFocus.value = false
+    }
+
+    fun checkAndShowTemplatePopup(cursorOffset: Int) {
+        val currentState = _state.value
+        val (wordStart, currentWord) = getCurrentWord(currentState.code, cursorOffset)
+
+        if (currentWord.length >= 2) {
+            val matching = LiveTemplate.findMatching(currentWord)
+
+            _state.update {
+                it.copy(
+                    showTemplatePopup = matching.isNotEmpty(),
+                    matchingTemplates = matching,
+                    selectedTemplateIndex = 0,
+                    currentWordStart = wordStart
+                )
+            }
+        } else {
+            hideTemplatePopup()
+        }
+    }
+
+    fun showTemplatePopup(cursorOffset: Int) {
+        val currentState = _state.value
+        val (wordStart, currentWord) = getCurrentWord(currentState.code, cursorOffset)
+        val matching = LiveTemplate.findMatching(currentWord)
+
+        _state.update {
+            it.copy(
+                showTemplatePopup = matching.isNotEmpty(),
+                matchingTemplates = matching,
+                selectedTemplateIndex = 0,
+                currentWordStart = wordStart
+            )
+        }
+    }
+
+    fun hideTemplatePopup() {
+        _state.update {
+            it.copy(
+                showTemplatePopup = false,
+                matchingTemplates = emptyList(),
+                selectedTemplateIndex = 0
+            )
+        }
+    }
+
+    fun selectNextTemplate() {
+        _state.update {
+            if (it.matchingTemplates.isEmpty()) it
+            else it.copy(
+                selectedTemplateIndex = (it.selectedTemplateIndex + 1) % it.matchingTemplates.size
+            )
+        }
+    }
+
+    fun selectPreviousTemplate() {
+        _state.update {
+            if (it.matchingTemplates.isEmpty()) it
+            else it.copy(
+                selectedTemplateIndex = if (it.selectedTemplateIndex <= 0)
+                    it.matchingTemplates.size - 1
+                else it.selectedTemplateIndex - 1
+            )
+        }
+    }
+
+    fun applyTemplate(template: LiveTemplate, cursorOffset: Int): Pair<String, Int> {
+        val currentState = _state.value
+        val code = currentState.code
+        val wordStart = currentState.currentWordStart
+
+        val newCode = code.substring(0, wordStart) +
+                template.template +
+                code.substring(cursorOffset)
+
+        val newCursorPosition = wordStart + template.cursorOffset
+
+        _state.update {
+            it.copy(
+                code = newCode,
+                isDirty = true,
+                lineCount = newCode.count { char -> char == '\n' } + 1,
+                showTemplatePopup = false,
+                matchingTemplates = emptyList(),
+                selectedTemplateIndex = 0
+            )
+        }
+
+        return Pair(newCode, newCursorPosition)
+    }
+
+    private fun getCurrentWord(text: String, cursorOffset: Int): Pair<Int, String> {
+        if (cursorOffset <= 0 || cursorOffset > text.length) return Pair(cursorOffset, "")
+
+        var start = cursorOffset - 1
+        while (start >= 0 && text[start].isLetterOrDigit()) {
+            start--
+        }
+        start++
+
+        return Pair(start, text.substring(start, cursorOffset))
     }
 }
