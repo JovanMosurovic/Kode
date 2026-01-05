@@ -25,7 +25,7 @@ class EditorViewModel {
     }
 
     fun updateCursorPosition(offset: Int, text: String) {
-        val lines = text.substring(0, offset.coerceAtMost(text.length)).lines()
+        val lines = text.take(offset.coerceAtMost(text.length)).lines()
         val line = lines.size
         val column = lines.lastOrNull()?.length?.plus(1) ?: 1
 
@@ -37,23 +37,6 @@ class EditorViewModel {
 
     fun updateState(newState: EditorState) {
         _state.value = newState
-    }
-
-    fun clearCode() {
-        _state.update { EditorState.initial() }
-    }
-
-    fun openFile(filePath: String, content: String) {
-        _state.update { it.copy(
-            code = content,
-            currentFile = filePath,
-            isDirty = false,
-            lineCount = content.count { char -> char == '\n' } + 1
-        ) }
-    }
-
-    fun markAsSaved() {
-        _state.update { it.copy(isDirty = false) }
     }
 
     fun navigateToPosition(line: Int, column: Int) {
@@ -139,7 +122,7 @@ class EditorViewModel {
         val code = currentState.code
         val wordStart = currentState.currentWordStart
 
-        val newCode = code.substring(0, wordStart) +
+        val newCode = code.take(wordStart) +
                 template.template +
                 code.substring(cursorOffset)
 

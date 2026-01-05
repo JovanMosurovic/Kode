@@ -4,6 +4,8 @@ import io.github.jovanmosurovic.kode.ui.panels.console.ConsoleViewModel
 import io.github.jovanmosurovic.kode.ui.panels.editor.EditorViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -11,30 +13,42 @@ class CodeRunner(
     private val consoleViewModel: ConsoleViewModel,
     private val scope: CoroutineScope
 ) {
+    private var currentJob: Job? = null
+
+    private companion object {
+        private val KOTLINC_EXECUTABLE: String
+            get() {
+                val os = System.getProperty("os.name").lowercase()
+                return when {
+                    os.contains("win") -> "kotlinc.bat"
+                    else -> "kotlinc"
+                }
+            }
+        private const val KOTLINC_OPTIONS: String = "-script"
+    }
+
     fun runKotlinScript(editorViewModel: EditorViewModel) {
         val fileName = editorViewModel.state.value.currentFile
-        scope.launch {
-            consoleViewModel.clearConsole()
-            consoleViewModel.setRunning(true)
-            consoleViewModel.appendOutput("[INFO] Running Kotlin script... \n")
 
+        currentJob = scope.launch(Dispatchers.IO) {
             try {
-                val processBuilder = ProcessBuilder("kotlinc.bat", "-script", "\"$fileName\"")
-                    .apply {
-                        redirectErrorStream(false)
-                    }
+                val processBuilder = ProcessBuilder(KOTLINC_EXECUTABLE, KOTLINC_OPTIONS, fileName)
+                val process = processBuilder.start()
 
-                val process = withContext(Dispatchers.IO) {
-                    processBuilder.start()
+                withContext(Dispatchers.Main) {
+                    consoleViewModel.clearConsole()
+                    consoleViewModel.appendOutput("[INFO] Running Kotlin script...\n")
+                    consoleViewModel.setRunning(true)
+                    consoleViewModel.setProcess(process)
                 }
-                consoleViewModel.setProcess(process)
 
                 // stdout
                 launch(Dispatchers.IO) {
-                    process.inputStream.bufferedReader().useLines { lines ->
-                        lines.forEach { line ->
+                    process.inputStream.bufferedReader().use { reader ->
+                        val buffer = CharArray(1)
+                        while (isActive && reader.read(buffer) != -1) {
                             withContext(Dispatchers.Main) {
-                                consoleViewModel.appendOutput("$line\n")
+                                consoleViewModel.appendOutput(String(buffer))
                             }
                         }
                     }
@@ -42,27 +56,31 @@ class CodeRunner(
 
                 // stderr
                 launch(Dispatchers.IO) {
-                    process.errorStream.bufferedReader().useLines { lines ->
-                        lines.forEach { line ->
+                    process.errorStream.bufferedReader().use { reader ->
+                        val buffer = CharArray(1)
+                        while (isActive && reader.read(buffer) != -1) {
                             withContext(Dispatchers.Main) {
-                                consoleViewModel.appendOutput("[ERROR] $line\n", isError = true)
+                                consoleViewModel.appendOutput(String(buffer), isError = true)
                             }
                         }
                     }
                 }
 
-                // Wait for process to complete
-                val exitCode = withContext(Dispatchers.IO) {
-                    process.waitFor()
+                val exitCode = process.waitFor()
+
+                withContext(Dispatchers.Main) {
+                    consoleViewModel.appendOutput("\n[INFO] Exit code: $exitCode\n")
+                    consoleViewModel.setRunning(false)
+                    consoleViewModel.setProcess(null)
                 }
 
-                consoleViewModel.appendOutput("\n[INFO] Process finished with exit code: $exitCode\n")
-
             } catch (e: Exception) {
-                consoleViewModel.appendOutput("[ERROR] Failed to run script: ${e.message}\n", isError = true)
-            } finally {
-                consoleViewModel.setRunning(false)
-                consoleViewModel.setProcess(null)
+                withContext(Dispatchers.Main) {
+                    if (e !is java.io.IOException || !e.message?.contains("Stream closed")!!) {
+                        consoleViewModel.appendOutput("[ERROR] ${e.message}\n", isError = true)
+                    }
+                    consoleViewModel.setRunning(false)
+                }
             }
         }
     }
@@ -88,6 +106,7 @@ class CodeRunner(
     fun stopExecution() {
         consoleViewModel.state.value.currentProcess?.let { process ->
             process.destroyForcibly()
+            currentJob?.cancel()
             consoleViewModel.appendOutput("\n[INFO] Process terminated by user\n")
             consoleViewModel.setRunning(false)
             consoleViewModel.setProcess(null)
