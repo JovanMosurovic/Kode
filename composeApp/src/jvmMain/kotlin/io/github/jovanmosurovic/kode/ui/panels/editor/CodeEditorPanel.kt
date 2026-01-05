@@ -96,8 +96,8 @@ fun CodeEditorPanel(
         val popupPosition = remember(state.cursorLine, state.cursorColumn, editorPosition, scrollState.value) {
             val lineIndex = (state.cursorLine - 1).coerceAtLeast(0)
             IntOffset(
-                x = editorPosition.x + LINE_NUMBER_WIDTH + PADDING + (state.cursorColumn * CHAR_WIDTH),
-                y = editorPosition.y + PADDING + (lineIndex * LINE_HEIGHT) - scrollState.value + LINE_HEIGHT
+                x = editorPosition.x + LINE_NUMBER_WIDTH + (state.cursorColumn * CHAR_WIDTH),
+                y = editorPosition.y + PADDING + (lineIndex * LINE_HEIGHT) - scrollState.value - LINE_HEIGHT
             )
         }
 
