@@ -1,7 +1,6 @@
 package io.github.jovanmosurovic.kode.ui.dialogs
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -120,10 +119,10 @@ private fun InfoRow(label: String, value: String) {
         )
     }
 }
-
 @Composable
 private fun GitHubIcon(modifier: Modifier = Modifier) {
-    val isDark = isSystemInDarkTheme()
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val isDark = (backgroundColor.red + backgroundColor.green + backgroundColor.blue) / 3f < 0.5f
 
     Icon(
         painter = painterResource(
