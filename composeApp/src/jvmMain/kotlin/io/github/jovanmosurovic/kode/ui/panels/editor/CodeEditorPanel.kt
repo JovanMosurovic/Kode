@@ -117,7 +117,7 @@ fun CodeEditorPanel(
             }
         }
 
-        val highlightedCode = remember(state.code) { syntaxHighlighter.highlight(state.code) }
+        val highlightedCode = remember(state.code, syntaxHighlighter) { syntaxHighlighter.highlight(state.code) }
 
         val popupPosition = remember(state.cursorLine, state.cursorColumn, editorPosition, scrollState.value) {
             val lineIndex = (state.cursorLine - 1).coerceAtLeast(0)

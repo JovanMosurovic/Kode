@@ -15,7 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import io.github.jovanmosurovic.kode.ui.components.LayoutSelector
+import io.github.jovanmosurovic.kode.ui.components.ThemeSelector
 import io.github.jovanmosurovic.kode.ui.layout.PanelLayout
+import io.github.jovanmosurovic.kode.ui.theme.AppTheme
 import kode.composeapp.generated.resources.Res
 import kode.composeapp.generated.resources.play_icon
 import kode.composeapp.generated.resources.stop_icon
@@ -32,6 +34,8 @@ fun CustomToolbar(
     onExit: () -> Unit,
     onPaste: () -> Unit,
     onSelectAll: () -> Unit,
+    currentTheme: AppTheme,
+    onThemeChange: (AppTheme) -> Unit,
     currentLayout: PanelLayout,
     onLayoutChange: (PanelLayout) -> Unit,
     onLiveTemplatesHelp: () -> Unit,
@@ -77,6 +81,13 @@ fun CustomToolbar(
                     MenuItem.Separator,
                     MenuItem("About", Icons.Outlined.Info, onAbout)
                 )
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            ThemeSelector(
+                currentTheme = currentTheme,
+                onThemeChange = onThemeChange
             )
 
             Spacer(modifier = Modifier.weight(1f))

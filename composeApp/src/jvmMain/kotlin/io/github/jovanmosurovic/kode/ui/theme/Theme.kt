@@ -126,13 +126,126 @@ private val DarkEditorColors = EditorColors(
     warning = warningDark
 )
 
+private val AtomColorScheme = darkColorScheme(
+    primary = Color(0xFF61AFEF),
+    onPrimary = Color.White,
+    secondary = Color(0xFF98C379),
+    onSecondary = Color.White,
+    background = atomBackground,
+    onBackground = atomOnBackground,
+    surface = atomSurface,
+    onSurface = atomOnBackground,
+    surfaceVariant = Color(0xFF3E4451),
+    onSurfaceVariant = atomOnBackground,
+    error = Color(0xFFE06C75),
+    onError = Color.White,
+    outline = Color(0xFF4B5263),
+    outlineVariant = Color(0xFF3E4451),
+)
+
+private val MonokaiColorScheme = darkColorScheme(
+    primary = Color(0xFFA6E22E),
+    onPrimary = Color.Black,
+    secondary = Color(0xFF66D9EF),
+    onSecondary = Color.Black,
+    background = monokaiBackground,
+    onBackground = monokaiOnBackground,
+    surface = monokaiSurface,
+    onSurface = monokaiOnBackground,
+    surfaceVariant = Color(0xFF3E3D32),
+    onSurfaceVariant = monokaiOnBackground,
+    error = Color(0xFFF92672),
+    onError = Color.White,
+    outline = Color(0xFF75715E),
+    outlineVariant = Color(0xFF3E3D32),
+)
+
+private val DarculaColorScheme = darkColorScheme(
+    primary = Color(0xFF589DF6),
+    onPrimary = Color.White,
+    secondary = Color(0xFF499C54),
+    onSecondary = Color.White,
+    background = darculaBackground,
+    onBackground = darculaOnBackground,
+    surface = darculaSurface,
+    onSurface = darculaOnBackground,
+    surfaceVariant = Color(0xFF4E5254),
+    onSurfaceVariant = darculaOnBackground,
+    error = Color(0xFFFF6B68),
+    onError = Color.White,
+    outline = Color(0xFF606366),
+    outlineVariant = Color(0xFF4E5254),
+)
+
+
+private val AtomEditorColors = EditorColors(
+    keyword = atomKeyword,
+    string = atomString,
+    comment = atomComment,
+    number = atomNumber,
+    function = atomFunction,
+    type = atomType,
+    identifier = atomIdentifier,
+    operator = atomOperator,
+    bracket = atomBracket,
+    background = atomBackground,
+    lineNumberBackground = atomBackground,
+    lineNumber = atomLineNumber,
+    warning = Color(0xFFE5C07B)
+)
+
+private val MonokaiEditorColors = EditorColors(
+    keyword = monokaiKeyword,
+    string = monokaiString,
+    comment = monokaiComment,
+    number = monokaiNumber,
+    function = monokaiFunction,
+    type = monokaiType,
+    identifier = monokaiIdentifier,
+    operator = monokaiOperator,
+    bracket = monokaiBracket,
+    background = monokaiBackground,
+    lineNumberBackground = monokaiBackground,
+    lineNumber = monokaiLineNumber,
+    warning = Color(0xFFE6DB74)
+)
+
+private val DarculaEditorColors = EditorColors(
+    keyword = darculaKeyword,
+    string = darculaString,
+    comment = darculaComment,
+    number = darculaNumber,
+    function = darculaFunction,
+    type = darculaType,
+    identifier = darculaIdentifier,
+    operator = darculaOperator,
+    bracket = darculaBracket,
+    background = darculaBackground,
+    lineNumberBackground = darculaBackground,
+    lineNumber = darculaLineNumber,
+    warning = Color(0xFFBBB529)
+)
+
 @Composable
 fun KodeTheme(
-    darkTheme: Boolean = true,
+    theme: AppTheme = AppTheme.DARK,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-    val editorColors = if (darkTheme) DarkEditorColors else LightEditorColors
+    val colorScheme = when (theme) {
+        AppTheme.LIGHT -> LightColorScheme
+        AppTheme.DARK -> DarkColorScheme
+        AppTheme.ATOM -> AtomColorScheme
+        AppTheme.MONOKAI -> MonokaiColorScheme
+        AppTheme.DARCULA -> DarculaColorScheme
+    }
+
+    val editorColors = when (theme) {
+        AppTheme.LIGHT -> LightEditorColors
+        AppTheme.DARK -> DarkEditorColors
+        AppTheme.ATOM -> AtomEditorColors
+        AppTheme.MONOKAI -> MonokaiEditorColors
+        AppTheme.DARCULA -> DarculaEditorColors
+    }
 
     CompositionLocalProvider(LocalEditorColors provides editorColors) {
         MaterialTheme(

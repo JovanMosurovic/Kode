@@ -28,6 +28,7 @@ import io.github.jovanmosurovic.kode.ui.menu.FileMenuActions
 import io.github.jovanmosurovic.kode.ui.menubar.CustomToolbar
 import io.github.jovanmosurovic.kode.ui.panels.console.ConsoleViewModel
 import io.github.jovanmosurovic.kode.ui.panels.editor.EditorViewModel
+import io.github.jovanmosurovic.kode.ui.theme.AppTheme
 import io.github.jovanmosurovic.kode.ui.theme.KodeTheme
 import io.github.jovanmosurovic.kode.utils.FileConstants
 
@@ -42,6 +43,7 @@ fun App(onCloseRequest: () -> Unit = {}) {
     val editorState by editorViewModel.state.collectAsState()
 
     var currentLayout by remember { mutableStateOf(PanelLayout.HORIZONTAL_50_50) }
+    var currentTheme by remember { mutableStateOf(AppTheme.DARK) }
     var showLiveTemplatesDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
 
@@ -58,7 +60,7 @@ fun App(onCloseRequest: () -> Unit = {}) {
         }
     }
 
-    KodeTheme {
+    KodeTheme(theme = currentTheme) {
         Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             CustomToolbar(
                 onRunClick = {
@@ -73,6 +75,8 @@ fun App(onCloseRequest: () -> Unit = {}) {
                 onExit = onCloseRequest,
                 onPaste = { editorViewModel.paste() },
                 onSelectAll = { editorViewModel.selectAll() },
+                currentTheme = currentTheme,
+                onThemeChange = { currentTheme = it },
                 currentLayout = currentLayout,
                 onLayoutChange = { currentLayout = it },
                 onAbout = { showAboutDialog = true },
