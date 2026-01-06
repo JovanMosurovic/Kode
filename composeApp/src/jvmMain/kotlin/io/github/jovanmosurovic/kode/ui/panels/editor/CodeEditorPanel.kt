@@ -135,7 +135,7 @@ fun CodeEditorPanel(
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(editorColors.background)
+//                    .background(editorColors.background)
                     .onGloballyPositioned { coords ->
                         val pos = coords.positionInRoot()
                         editorPosition = IntOffset(pos.x.toInt(), pos.y.toInt())

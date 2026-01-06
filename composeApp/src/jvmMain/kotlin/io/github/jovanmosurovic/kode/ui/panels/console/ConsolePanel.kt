@@ -67,7 +67,7 @@ fun ConsolePanel(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(editorColors.background)
+//                .background(editorColors.background)
         ) {
             // Output area
             Box(

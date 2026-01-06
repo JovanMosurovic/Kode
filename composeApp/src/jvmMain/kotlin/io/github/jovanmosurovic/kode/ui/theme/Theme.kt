@@ -135,12 +135,12 @@ private val AtomColorScheme = darkColorScheme(
     onBackground = atomOnBackground,
     surface = atomSurface,
     onSurface = atomOnBackground,
-    surfaceVariant = Color(0xFF3E4451),
+    surfaceVariant = atomSurfaceVariant,
     onSurfaceVariant = atomOnBackground,
     error = Color(0xFFE06C75),
     onError = Color.White,
     outline = Color(0xFF4B5263),
-    outlineVariant = Color(0xFF3E4451),
+    outlineVariant = atomSurfaceVariant,
 )
 
 private val MonokaiColorScheme = darkColorScheme(
@@ -152,12 +152,12 @@ private val MonokaiColorScheme = darkColorScheme(
     onBackground = monokaiOnBackground,
     surface = monokaiSurface,
     onSurface = monokaiOnBackground,
-    surfaceVariant = Color(0xFF3E3D32),
+    surfaceVariant = monokaiSurfaceVariant,
     onSurfaceVariant = monokaiOnBackground,
     error = Color(0xFFF92672),
     onError = Color.White,
     outline = Color(0xFF75715E),
-    outlineVariant = Color(0xFF3E3D32),
+    outlineVariant = monokaiSurfaceVariant,
 )
 
 private val DarculaColorScheme = darkColorScheme(
@@ -169,14 +169,13 @@ private val DarculaColorScheme = darkColorScheme(
     onBackground = darculaOnBackground,
     surface = darculaSurface,
     onSurface = darculaOnBackground,
-    surfaceVariant = Color(0xFF4E5254),
+    surfaceVariant = darculaSurfaceVariant,
     onSurfaceVariant = darculaOnBackground,
     error = Color(0xFFFF6B68),
     onError = Color.White,
     outline = Color(0xFF606366),
-    outlineVariant = Color(0xFF4E5254),
+    outlineVariant = darculaSurfaceVariant,
 )
-
 
 private val AtomEditorColors = EditorColors(
     keyword = atomKeyword,

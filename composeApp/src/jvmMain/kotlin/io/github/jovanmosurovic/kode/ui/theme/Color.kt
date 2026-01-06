@@ -45,13 +45,13 @@ val onErrorContainerDark = Color(0xFFFFDAD6)
 val warningLight = Color(0xFFF57C00)
 val warningDark = Color(0xFFFFB74D)
 
-val backgroundLight = Color(0xFFFDFCFF)
+val backgroundLight = Color(0xFFF5F5F5)
 val onBackgroundLight = Color(0xFF1A1C1E)
 
 val backgroundDark = Color(0xFF2B2D30)
 val onBackgroundDark = Color(0xFFE2E2E6)
 
-val surfaceLight = Color(0xFFFDFCFF)
+val surfaceLight = Color(0xFFFFFFFF)
 val onSurfaceLight = Color(0xFF1A1C1E)
 val surfaceVariantLight = Color(0xFFDFE2EB)
 val onSurfaceVariantLight = Color(0xFF43474E)
@@ -97,7 +97,8 @@ val codeLineNumberDark = Color(0xFF6F737A)
 
 // Atom One Dark theme
 val atomBackground = Color(0xFF282C34)
-val atomSurface = Color(0xFF21252B)
+val atomSurface = Color(0xFF323842)
+val atomSurfaceVariant = Color(0xFF3E4451)
 val atomOnBackground = Color(0xFFABB2BF)
 val atomKeyword = Color(0xFFC678DD)
 val atomString = Color(0xFF98C379)
@@ -112,7 +113,8 @@ val atomLineNumber = Color(0xFF4B5263)
 
 // Monokai theme
 val monokaiBackground = Color(0xFF272822)
-val monokaiSurface = Color(0xFF1E1F1C)
+val monokaiSurface = Color(0xFF34352F)
+val monokaiSurfaceVariant = Color(0xFF3E3D32)
 val monokaiOnBackground = Color(0xFFF8F8F2)
 val monokaiKeyword = Color(0xFFF92672)
 val monokaiString = Color(0xFFE6DB74)
@@ -128,6 +130,7 @@ val monokaiLineNumber = Color(0xFF90908A)
 // Darcula theme
 val darculaBackground = Color(0xFF2B2B2B)
 val darculaSurface = Color(0xFF3C3F41)
+val darculaSurfaceVariant = Color(0xFF4E5254)
 val darculaOnBackground = Color(0xFFA9B7C6)
 val darculaKeyword = Color(0xFFCC7832)
 val darculaString = Color(0xFF6A8759)
