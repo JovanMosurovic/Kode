@@ -1,6 +1,5 @@
 package io.github.jovanmosurovic.kode.ui.panels.editor
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -67,6 +66,7 @@ fun CodeEditorPanel(
 
         var editorPosition by remember { mutableStateOf(IntOffset.Zero) }
         var textFieldValue by remember { mutableStateOf(TextFieldValue(text = state.code)) }
+        var previousTextLength by remember { mutableStateOf(state.code.length) }
 
         LaunchedEffect(state.code) {
             if (textFieldValue.text != state.code) {
@@ -147,10 +147,13 @@ fun CodeEditorPanel(
                     BasicTextField(
                         value = textFieldValue,
                         onValueChange = { newValue ->
+                            val textChanged = newValue.text.length != previousTextLength
+                            previousTextLength = newValue.text.length
+
                             textFieldValue = newValue
                             if (newValue.text != state.code) viewModel.updateCode(newValue.text)
                             viewModel.updateCursorPosition(newValue.selection.start, newValue.text)
-                            viewModel.checkAndShowTemplatePopup(newValue.selection.start)
+                            viewModel.checkAndShowTemplatePopup(newValue.selection.start, textChanged)
                             scope.launch {
                                 val targetScroll = newValue.text.count { it == '\n' } * LINE_HEIGHT
                                 scrollState.animateScrollTo(targetScroll.coerceAtLeast(0))

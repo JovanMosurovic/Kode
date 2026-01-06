@@ -23,12 +23,15 @@ class EditorViewModel {
     private val _requestPaste = MutableStateFlow(false)
     val requestPaste: StateFlow<Boolean> = _requestPaste.asStateFlow()
 
+    private var lastTextLength = 0
+
     fun updateCode(newCode: String) {
         _state.update { it.copy(
             code = newCode,
             isDirty = true,
             lineCount = newCode.count { char -> char == '\n' } + 1
         ) }
+        lastTextLength = newCode.length
     }
 
     fun updateCursorPosition(offset: Int, text: String) {
@@ -86,7 +89,11 @@ class EditorViewModel {
         }
     }
 
-    fun checkAndShowTemplatePopup(cursorOffset: Int) {
+    fun checkAndShowTemplatePopup(cursorOffset: Int, textChanged: Boolean) {
+        if (!textChanged) {
+            hideTemplatePopup()
+            return
+        }
         val currentState = _state.value
         val (wordStart, currentWord) = getCurrentWord(currentState.code, cursorOffset)
 
