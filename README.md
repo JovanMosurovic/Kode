@@ -17,7 +17,7 @@ It features syntax highlighting, live output streaming during execution, and cli
 
 ## Project Demo
 
-[Demo will be uploaded shortly]
+https://github.com/user-attachments/assets/f849b28e-88ed-431d-99db-faa689822ff4
 
 > **Note:** The demo showcases only some of the features of the project.
 
